@@ -1,0 +1,67 @@
+# Ansible playbook to setup a WireGuard VPN server
+
+- hosts: bastion
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Create Directories for Docker Volume mapping
+      file:
+        path:  "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - "{{ user_dir}}"
+        - "{{ user_dir}}/config"
+        
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+
+    - name: Pull the Wireguard image
+      docker_image:
+        name: linuxserver/wireguard
+        source: pull
+
+    - name: Run the Wireguard container
+      docker_container:
+        name: wireguard
+        image: linuxserver/wireguard
+        state: started
+        restart_policy: always
+        capabilities:
+          - NET_ADMIN
+          - SYS_MODULE
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: "America/New_York"
+          SERVERURL: "auto"
+          SERVERPORT: "51820"
+          PEERS: "{{ number_of_peers | string }}"
+          PEERDNS: "auto"
+          INTERNAL_SUBNET: "10.13.13.0"
+        ports:
+          - "51820:51820/udp"
+        volumes:
+          - "{{ user_dir}}/config:/config"
+          - "/etc/timezone:/etc/timezone:ro"
+          - "/etc/localtime:/etc/localtime:ro"
+        sysctls:
+          net.ipv4.conf.all.src_valid_mark: "1"
+    - name: Fetch peer configuration files
+      fetch:
+        src: "{{ user_dir }}/config/peer{{ item }}/peer{{ item }}.conf"
+        dest: "{{ path_to_save_configs }}/configs/"
+        flat: yes
+      loop: "{{ range(1, number_of_peers + 1)|list }}"
+
+    - name: Fetch peer QR code files
+      fetch:
+        src: "{{ user_dir }}/config/peer{{ item }}/peer{{ item }}.png"
+        dest: "{{ path_to_save_configs }}/qrcodes/"
+        flat: yes
+      loop: "{{ range(1, number_of_peers + 1)|list }}"
+  
