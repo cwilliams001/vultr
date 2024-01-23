@@ -1,5 +1,0 @@
-user_dir: "/home/{{ ansible_env.USER }}/wireguard"
-
-number_of_peers: 1
-
-path_to_save_configs: "/home/{{ lookup('env', 'USER') }}/Desktop"
