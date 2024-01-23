@@ -1,0 +1,12 @@
+user_dir: "/home/{{ ansible_env.USER }}/wireguard"
+
+# Number of peers to create
+number_of_peers: 1
+
+# 1420 is the default value
+server_mtu_value: 1360 
+
+peer_mtu_value: 1360  
+
+# Change the path to save to wherever you want the wireguard configs and qrcodes to be saved
+path_to_save_configs: "/home/{{ lookup('env', 'USER') }}/Desktop"

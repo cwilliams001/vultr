@@ -20,10 +20,10 @@ resource "vultr_instance" "test_bastion" {
   os_id       = "1743"
   label       = "test_bastion"
   ssh_key_ids = [var.ssh_key_id]
-
-
-# Local provisioner to write the instance's IP to the inventory.ini fil
-  provisioner "local-exec" {
-    command = "printf '[bastion]\n${vultr_instance.test_bastion.main_ip}\n' >> ./playbooks/inventory.ini"
-  }
 }
+
+resource "local_file" "ansible_inventory" {
+  content = templatefile("${path.module}/playbooks/templates/inventory.ini.tpl", { bastion_ip = vultr_instance.test_bastion.main_ip})
+  filename = "${path.module}/playbooks/inventory.ini"
+}
+
