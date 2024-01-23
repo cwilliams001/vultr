@@ -42,6 +42,6 @@ curl -H 'Authorization: Bearer Vultr_API_KEY' https://api.vultr.com/v2/ssh-keys
    ansible-playbook -i playbooks/inventory.ini playbooks/dwg.yml -u root
    ```
 
-   This will setup the WireGuard VPN server on the Vultr instance and fetch the peer configuration files and QR code images to your local machine by default they will be placed onto your Desktop in /config and /qrcodes. This can be changed by editing the `playbooks/vars.yml` file.
+   This will setup the WireGuard VPN server on the Vultr instance and fetch the peer configuration files and QR code images to your local machine by default they will be placed onto your Desktop in /config and /qrcodes. This can be changed by editing the `playbooks/vars/main.yml` file.
 
 6. Connect to the VPN server using the downloaded configuration files or QR code images.
