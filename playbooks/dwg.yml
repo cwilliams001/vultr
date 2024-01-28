@@ -44,6 +44,7 @@
           PEERDNS: "1.1.1.1"
           ALLOWEDIPS: "0.0.0.0/0"
           INTERNAL_SUBNET: "10.13.13.0"
+          PERSISTENTKEEPALIVE_PEERS: "all"
         ports:
           - "51820:51820/udp"
         volumes:
@@ -53,6 +54,12 @@
         sysctls:
           net.ipv4.conf.all.src_valid_mark: "1"
     
+    - name: Add PersistentKeepalive to peer configuration files
+      lineinfile:
+          path: "{{ user_dir }}/config/peer{{ item }}/peer{{ item }}.conf"
+          line: "PersistentKeepalive = 25"
+          create: no
+      loop: "{{ range(1, number_of_peers + 1)|list }}"
     
     - name: Copy MTU update scripts to target
       template:
